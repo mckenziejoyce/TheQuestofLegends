@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Market {
 	private List<SellableObject> sellableItems;
 	private List<SellableObject> buyableItems;
-	private String buyables = "buyables.txt";
+	private String buyables = "src/buyables.txt";
 	Scanner userResponse = new Scanner( System.in );
 	
 	public Market() {

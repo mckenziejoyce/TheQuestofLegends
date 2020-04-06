@@ -406,9 +406,9 @@ public abstract class Hero {
 	}
 	public void roundRenewal() {
 		if(alive) {
-			double hpInc = this.healthPower * .05;
+			double hpInc = this.healthPower * .1;
 			this.increaseHP(hpInc);
-			double manaIncrease = this.mana *.05;
+			double manaIncrease = this.mana *.1;
 			this.increaseMana(manaIncrease);
 		}
 	}
