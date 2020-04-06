@@ -38,6 +38,7 @@ public class TheQuestOfLegends {
 	public static void main(String[] args) throws FileNotFoundException{
 		TheQuestOfLegends game = new TheQuestOfLegends();
 		game.printBoard();
+		game.startGame();
 		
 	}
 	//Testing method 
@@ -50,10 +51,9 @@ public class TheQuestOfLegends {
 		System.out.println(this.world);
 	}
 	public void playGame() throws FileNotFoundException{
-		
+		startGame();
 	}
 	public void startGame() throws FileNotFoundException {
-		setMonsters(generateMonsters());
 		//System.out.println(ANSI_RED +"Welcome to the Quest!"+ ANSI_RESET);
 		System.out.println("        ,     \\    /      ,        \n" + 
 				"       / \\    )\\__/(     / \\       \n" + 
@@ -61,7 +61,7 @@ public class TheQuestOfLegends {
 				" ____/_____\\__\\@  @/___/_____\\____ \n" + 
 				"|             |\\../|              |\n" + 
 				"|              \\VV/               |\n" + 
-				"|   -- Welcome to The Quest --    |\n" + 
+				"| Welcome to The Quest of Legends |\n" + 
 				"|_________________________________|\n" + 
 				" |    /\\ /      \\\\       \\ /\\    | \n" + 
 				" |  /   V        ))       V   \\  | \n" + 
@@ -70,13 +70,14 @@ public class TheQuestOfLegends {
 				"");
 		System.out.println("First you must select your heroes");
 		chooseHeroes();
-		
+		chooseMonsters();
 		System.out.println("Great now lets go over some logistics!");
 		System.out.println("Commands: \n W/w: move up\n" + "A/a: move left\n" + "S/s: move down\n" + "D/d: move right\n"+"I/i: View information about your heroes (or if you are in a fight the monsters as well)\n"+
 				"Q/q: Quit the game\n"+"V/v: Display inventories\n"+"C/c: Change weapon or armor\n"+"P/p: Consume Potion\n"+"M/m: Display the Map\n");
 		System.out.println("When looking at the map you will see C for common tiles, M for marketplaces, N for tiles you cant visit, and a * to show where you are");
 		System.out.println("Now that we've covered the basic rules lets start playing");
 		System.out.println(world);
+		
 	}
 	public List<Monster> generateMonsters() throws FileNotFoundException{
 		List<String> strRep = new ArrayList<String>();
@@ -112,9 +113,26 @@ public class TheQuestOfLegends {
         }
         return monsters;
 	}
-	public void setMonsters(List<Monster> monsters) throws FileNotFoundException {
-		this.monsters = monsters;
+	
+	public void chooseMonsters()throws FileNotFoundException{
+		List<Monster> monsterOptions = generateMonsters();
+		double minlevel = heroes.get(0).getLevel();
+		for(int i = 0; i<heroes.size(); i++) {
+			minlevel = Math.min(minlevel, heroes.get(i).getLevel());
+		}
+		Random rand = new Random();
+		int i =0;
+		while(i<playersPerTeam) {
+			int ri = rand.nextInt(monsterOptions.size());
+			if(monsterOptions.get(ri).getLevel() <= minlevel) {
+				monsters.add(monsterOptions.get(ri));
+				i++;
+			}
+		}
+		world.spawnMonsters();
+		
 	}
+
 	public void chooseHeroes() throws FileNotFoundException {
 		List<Hero> heroOptions = generateHereos();
 		int numberOfHeroes = playersPerTeam;
@@ -149,6 +167,7 @@ public class TheQuestOfLegends {
 			Hero h = heroOptions.get(heronum);
 			heroes.add(h);
 		}
+		world.spawnHeroes(heroes);
 		
 	}
 	public TheQuestOfLegends getGameState() {

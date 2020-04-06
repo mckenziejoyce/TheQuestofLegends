@@ -17,7 +17,9 @@ public class QuestBoard extends Board{
 	private List<Monster> monsters;
 	private GamePiece[] heroTokens = {new GamePiece("*H1","HeroOne",5),new GamePiece("*H2","HeroTwo",5),new GamePiece("*H3","HeroThree",5)};
 	private GamePiece[] monsterTokens = {new GamePiece("*M1","MonsterOne",5),new GamePiece("*M2","MonsterTwo",5),new GamePiece("*M3","MonsterThree",5)};
+	// Each hero has an array [row index,col index]
 	private int[][] heroCoords = new int[3][2];
+	private int[][] monsterCoords = new int[3][2];
 	private int curHero = 0;
 	private GamePiece nonAccessible = new GamePiece("XXX","NonAcc",-1);
 	private GamePiece Nexus = new GamePiece(" N ","Nexus",11);
@@ -62,6 +64,7 @@ public class QuestBoard extends Board{
 				}
 			}
 		}
+		
 	
 	}
 	public QuestBoard(TheQuestOfLegends gameState) {
@@ -78,6 +81,28 @@ public class QuestBoard extends Board{
 //			
 //		}
 	}
+	private void setCurHero(int num) {
+		if(num>= heroes.size() || num < 0) {
+			throw new IllegalArgumentException();
+		}
+		curHero = num;
+	}
+	public void nextTurn() {
+		if(curHero+1 >= heroes.size()) {
+			setCurHero(0);
+		}
+		else {
+			setCurHero(curHero+1);
+		}
+	}
+	public void prevTurn() {
+		if(curHero-1 < 0) {
+			setCurHero(heroes.size()-1);
+		}
+		else {
+			setCurHero(curHero-1);
+		}
+	}
 	public void setTiles(int num, GamePiece tok) {
 		int h,w;
 		for(int i =0; i <num;i++) {
@@ -91,68 +116,112 @@ public class QuestBoard extends Board{
 			}
 		}
 	}
+	public void spawnHeroes(List<Hero> h) {
+		heroes = h;
+		int j=0;
+		for(int i=0; i<3;i++) {
+			GamePiece token = heroTokens[i];
+			// setting row val 
+			heroCoords[i][0] = this.getHeight()-1;
+			//Setting col val 
+			heroCoords[i][1] = j;
+			// Sets the next hero three cols apart 
+			layout[this.getHeight()-1][j].setToken(token);
+			j += 3;
+		}
+	}
+	public void spawnMonsters() {
+		int j=0;
+		for(int i=0; i<3;i++) {
+			GamePiece token = monsterTokens[i];
+			// setting row val 
+			monsterCoords[i][0] = 0;
+			monsterCoords[i][1] = j;
+			// Sets the next monster three cols apart 
+			layout[0][j].setToken(token);
+			j += 3;
+		}
+	}
 
 	public void setGame(TheQuestOfLegends gameState) {
 		game = gameState;
 	}
 	public void undo() {
 		if(lastMove.compareToIgnoreCase("up")==0) {
+			prevTurn();
 			moveDown();
 		}
 		else if(lastMove.compareToIgnoreCase("down")==0) {
+			prevTurn();
 			moveUp();
 		}
 		else if(lastMove.compareToIgnoreCase("left")==0) {
+			prevTurn();
 			moveRight();
 		}
 		else if(lastMove.compareToIgnoreCase("right")==0) {
+			prevTurn();
 			moveLeft();
 		}
 	}
 	public GamePiece moveUp() {
 		int heroRow = heroCoords[curHero][0];
 		int heroCol = heroCoords[curHero][1];
+		GamePiece heroToken = heroTokens[curHero];
 		if(heroRow-1 < 0) {
 			throw new IllegalArgumentException();
 		}
-		this.layout[heroRow][heroCol].removeToken(heroTeam);
+		this.layout[heroRow][heroCol].removeToken(heroToken);
 		GamePiece token = this.layout[heroRow-1][heroCol].getToken();
-		this.layout[heroRow-1][heroCol].setToken(heroTeam);
-		heroRow = heroRow-1;
+		this.layout[heroRow-1][heroCol].setToken(heroToken);
+		heroCoords[curHero][0] = heroRow-1;
 		lastMove = "up";
+		nextTurn();
 		return token;
 	}
 	public GamePiece moveDown() {
+		int heroRow = heroCoords[curHero][0];
+		int heroCol = heroCoords[curHero][1];
+		GamePiece heroToken = heroTokens[curHero];
 		if(heroRow+1 >= this.getHeight()) {
 			throw new IllegalArgumentException();
 		}
-		this.layout[heroRow][heroCol].removeToken(heroTeam);
+		this.layout[heroRow][heroCol].removeToken(heroToken);
 		GamePiece token = this.layout[heroRow+1][heroCol].getToken();
-		this.layout[heroRow+1][heroCol].setToken(heroTeam);
-		heroRow = heroRow+1;
+		this.layout[heroRow+1][heroCol].setToken(heroToken);
+		heroCoords[curHero][0] = heroRow+1;
 		lastMove = "down";
+		nextTurn();
 		return token;
 	}
 	public GamePiece moveLeft() {
+		int heroRow = heroCoords[curHero][0];
+		int heroCol = heroCoords[curHero][1];
+		GamePiece heroToken = heroTokens[curHero];
 		if(heroCol-1 < 0) {
 			throw new IllegalArgumentException();
 		}
-		this.layout[heroRow][heroCol].removeToken(heroTeam);
+		this.layout[heroRow][heroCol].removeToken(heroToken);
 		GamePiece token = this.layout[heroRow][heroCol-1].getToken();
-		this.layout[heroRow][heroCol-1].setToken(heroTeam);
-		heroCol = heroCol-1;
+		this.layout[heroRow][heroCol-1].setToken(heroToken);
+		heroCoords[curHero][1] = heroCol-1;
 		lastMove = "left";
+		nextTurn();
 		return token;
 	}
 	public GamePiece moveRight() {
+		int heroRow = heroCoords[curHero][0];
+		int heroCol = heroCoords[curHero][1];
+		GamePiece heroToken = heroTokens[curHero];
 		if(heroCol+1 >= this.getWidth()) {
 			throw new IllegalArgumentException();
 		}
-		this.layout[heroRow][heroCol].removeToken(heroTeam);
+		this.layout[heroRow][heroCol].removeToken(heroToken);
 		GamePiece token = this.layout[heroRow][heroCol+1].getToken();
-		this.layout[heroRow][heroCol+1].setToken(heroTeam);
-		heroCol = heroCol+1;
+		this.layout[heroRow][heroCol+1].setToken(heroToken);
+		heroCoords[curHero][1] = heroCol+1;
 		lastMove = "right";
+		nextTurn();
 		return token;
 	}
 	
