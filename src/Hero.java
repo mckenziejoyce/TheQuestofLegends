@@ -3,18 +3,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class Hero {
+public abstract class Hero extends LivingCreature implements Fightable {
 	private int levelCap = 1000000000;
 	private int hpCap = 1000000000;
 	private int manaCap = 1000000000;
 	private int skillsCap = 1000000000;
 	private double winReward = 150;
 	
-	
-	private String name;
-	private double level;
 	private double xp;
-	private double healthPower;
 	private double mana;
 	private List<Weapon> weapons;
 	private Weapon curWeapon;
@@ -33,7 +29,6 @@ public abstract class Hero {
 	
 	//Constructors
 	public Hero() {
-		name = "";
 		alive = true;
 		inFight = false;
 		setLevel(0);
@@ -43,7 +38,7 @@ public abstract class Hero {
 		setDexerity(0);
 		setStrength(0);
 		dodgeProbability = calculateDodgeProbability();
-		wallet = new Wallet(level*50);
+		wallet = new Wallet(this.getLevel()*50);
 		market = new Market(this);
 		potions = new ArrayList<Potion>();
 		spells = new ArrayList<Spell>();
@@ -53,14 +48,14 @@ public abstract class Hero {
 	public Hero(double l, double hp, double mn) {
 		this();
 		setLevel(l);
-		wallet.increaseCoins(level*50);
+		wallet.increaseCoins(this.getLevel()*50);
 		setHP(hp);
 		setMana(mn);
 	}
 	public Hero(double l, double hp, double mn, double a, double s, double d) {
 		this();
 		setLevel(l);
-		wallet.increaseCoins(level*50);
+		wallet.increaseCoins(this.getLevel()*50);
 		setHP(hp);
 		setMana(mn);
 		setAgility(a);
@@ -69,18 +64,11 @@ public abstract class Hero {
 	}
 	
 	//Accessor methods 
-	public String getName() {
-		return name;
-	}
-	public double getLevel() {
-		return level;
-	}
+	
 	public double getXP() {
 		return xp;
 	}
-	public double getHP() {
-		return healthPower;
-	}
+	
 	public double getMana() {
 		return mana;
 	}
@@ -117,9 +105,7 @@ public abstract class Hero {
 	public Market getMarket() {
 		return market;
 	}
-	public boolean isAlive() {
-		return alive;
-	}
+	
 	public boolean isFighting() {
 		return inFight;
 	}
@@ -131,31 +117,18 @@ public abstract class Hero {
 	}
 
 	//Setter methods 
-	public void setName(String name) {
-		this.name = name;
-	}
-	public void setLevel(double n) {
-		if(n < 0 || n > levelCap) {
-			throw new IllegalArgumentException();
-		}
-		level = n;
-		setHP(n*100);
-	}
+	
+	
 	public void setXP(double n) {
 		if(n < 0) {
 			throw new IllegalArgumentException();
 		}
-		if(n >= (level*10)) {
+		if(n >= (this.getLevel()*10)) {
 			levelUp();
 		}
 		xp = n;
 	}
-	public void setHP(double n) {
-		if(n < 0 || n > hpCap) {
-			throw new IllegalArgumentException();
-		}
-		healthPower = n;
-	}
+	
 	public void setMana(double n) {
 		if(n < 0|| n > manaCap) {
 			throw new IllegalArgumentException();
@@ -273,21 +246,11 @@ public abstract class Hero {
 	public void increaseXP(double x) {
 		setXP(xp+x);
 	}
-	public void increaseHP(double x) {
-		setHP(healthPower+x);
-	}
+	
 	public void increaseMana(double m) {
 		setMana(mana +m);
 	}
-	public void decreaseHP(double x) {
-		if(healthPower-x <= 0) {
-			setHP(0);
-			alive = false;
-		}
-		else {
-			setHP(healthPower-x);
-		}
-	}
+	
 	public void decreaseMana(double d) {
 		setMana(mana-d);
 	}
@@ -301,6 +264,12 @@ public abstract class Hero {
 			return;
 		}
 		decreaseHP(d-this.getCurArmor().getProtection());
+	}
+	public void startedFight() {
+		inFight = true;
+	}
+	public void endedFight() {
+		inFight = false;
 	}
 	public void buyItem(SellableObject o) {
 		Weapon w = new Weapon();
@@ -340,7 +309,7 @@ public abstract class Hero {
 	}
 	public boolean equals(Hero h) {
 		boolean eq = true;
-		if(h.name != name || h.level != level || h.xp != xp || h.mana != mana || h.healthPower != healthPower) {
+		if(h.getName() != this.getName() || h.getLevel() != this.getLevel() || h.xp != xp || h.mana != mana || h.getHP() != this.getHP()) {
 			eq = false;
 		}
 		else if(h.agility != agility || h.strength != strength || h.dexerity != dexerity) {
@@ -401,12 +370,12 @@ public abstract class Hero {
 		}
 		else {
 			alive = true;
-			setHP((100*level)/2);
+			setHP((100*this.getLevel())/2);
 		}
 	}
 	public void roundRenewal() {
 		if(alive) {
-			double hpInc = this.healthPower * .1;
+			double hpInc = this.getHP() * .1;
 			this.increaseHP(hpInc);
 			double manaIncrease = this.mana *.1;
 			this.increaseMana(manaIncrease);

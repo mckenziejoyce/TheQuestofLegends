@@ -44,7 +44,7 @@ public class TheQuest {
 		//startItems = "src/startItems.txt";
 		heroes = new ArrayList<Hero>();
 		monsters = new ArrayList<Monster>();
-		world = new QuestBoard(8,8);
+		world = new QuestBoard();
 		inFight = false;
 		
 	}

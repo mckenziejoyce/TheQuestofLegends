@@ -1,7 +1,7 @@
 import java.util.Random;
 
-public abstract class Monster {
-	private int hpCap = 1000000000;
+public abstract class Monster extends LivingCreature implements Fightable {
+	
 	private double defaultBD = 100;
 	private double defaultDlevel = 90;
 	private double defaultdodgechance = 30;
@@ -10,19 +10,15 @@ public abstract class Monster {
 	private double baseDamage;
 	private double defenseLevel;
 	private double dodgeChance;
-	private String name;
-	private double hp;
-	private double level;
-	private boolean isAlive;
 	private boolean isFighting;
 	
 	public Monster() {
+		super();
 		setBaseDamage(defaultBD);
 		setDefenseLevel(defaultDlevel);
 		setDodgeChance(defaultdodgechance);
 		setName(defaultName);
 		setLevel(defaultLevel);
-		isAlive = true;
 	}
 	public double getBaseDamage() {
 		return this.baseDamage;
@@ -32,18 +28,6 @@ public abstract class Monster {
 	}
 	public double getDodgeChance() {
 		return this.dodgeChance;
-	}
-	public double getHP() {
-		return this.hp;
-	}
-	public double getLevel() {
-		return this.level;
-	}
-	public String getName() {
-		return this.name;
-	}
-	public boolean isAlive() {
-		return isAlive;
 	}
 	public boolean isFighting() {
 		return isFighting;
@@ -71,33 +55,6 @@ public abstract class Monster {
 			throw new IllegalArgumentException();
 		}
 		this.dodgeChance = b;
-	}
-	public void setHP() {
-		this.hp = level * 100;
-	}
-	private void setHP(double n) {
-		if(n < 0 || n > hpCap) {
-			hp=0;
-			return;
-		}
-		hp = n;
-	}
-	public void setLevel(double b) {
-		if(b < 0) {
-			throw new IllegalArgumentException();
-		}
-		this.level = b;
-		setHP();
-	}
-	public void setName(String b) {
-		this.name = b;
-	}
-	public void decreaseHP(double d) {
-		if(this.hp -d <= 0) {
-			setHP(0);
-			this.isAlive = false;
-		}
-		setHP(this.hp -d);
 	}
 	
 	public void getAttacked(double d) {
