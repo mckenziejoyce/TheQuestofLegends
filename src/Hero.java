@@ -399,4 +399,5 @@ public abstract class Hero extends LivingCreature implements Fightable {
 	public abstract void levelUp();
 	
 	
+	
 }

@@ -67,4 +67,5 @@ public class LivingCreature {
 	public void increaseHP(double x) {
 		setHP(hp+x);
 	}
+	
 }

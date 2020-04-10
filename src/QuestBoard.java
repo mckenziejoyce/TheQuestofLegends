@@ -16,29 +16,29 @@ public class QuestBoard extends Board{
 	private List<Hero> heroes;
 	private List<Monster> monsters;
 	private GamePiece[] heroTokens = {new GamePiece("*H1","HeroOne",5),new GamePiece("*H2","HeroTwo",5),new GamePiece("*H3","HeroThree",5)};
-	private GamePiece[] monsterTokens = {new GamePiece("*M1","MonsterOne",5),new GamePiece("*M2","MonsterTwo",5),new GamePiece("*M3","MonsterThree",5)};
+	private GamePiece monsterToken = new GamePiece("*M*","MonsterOne",5);
+	//private GamePiece[] monsterTokens = {new GamePiece("*M*","MonsterOne",5),new GamePiece("*M*","MonsterTwo",5),new GamePiece("*M*","MonsterThree",5)};
 	// Each hero has an array [row index,col index]
 	private int[][] heroCoords = new int[3][2];
-	private int[][] monsterCoords = new int[3][2];
-	public int curHero = 0;
+	private int[][] monsterCoords;
+	private int curHero = 0;
+	private int curMonster = 0;
 	private GamePiece nonAccessible = new GamePiece("XXX","NonAcc",-1);
-	private GamePiece Nexus = new GamePiece(" N ","Nexus",11);
+	private GamePiece HeroNexus = new GamePiece(" N ","Nexus",11);
+	private GamePiece monsterNexus = new GamePiece(" N ","Nexus",12);
 	private GamePiece Plain = new GamePiece(" P ","Plain",3);
 	private GamePiece Bush = new GamePiece(" B ","Bush",4);
 	private GamePiece Koulou = new GamePiece(" K ","Koulou",5);
 	private GamePiece Cave = new GamePiece(" C ","Cave",4);
 	
 	
-	//These will need to be commented out when we change the implementation of move but 
-	// I'm just keeping them so it compiles without complaint 
-	private int heroRow;
-	private int heroCol;
-	private GamePiece heroTeam = new GamePiece(" * ","Heroes", 5);
-	
 	public QuestBoard() {
 		super(8);
 		setHeight(8);
 		setWidth(8);
+		heroes = new ArrayList<Hero>();
+		monsters = new ArrayList<Monster>();
+		monsterCoords = new int[3][2];
 		int totalTile = this.getHeight()*this.getWidth();
 		for(int i = 0; i < this.getHeight(); i++) {
 			layout[i][nonAccColNum1].setToken(nonAccessible);
@@ -46,8 +46,8 @@ public class QuestBoard extends Board{
 		}
 		for(int i = 0; i < this.getWidth(); i++) {
 			if(!layout[0][i].hasToken()) {
-				layout[0][i].setToken(Nexus);
-				layout[this.getHeight()-1][i].setToken(Nexus);
+				layout[0][i].setToken(monsterNexus);
+				layout[this.getHeight()-1][i].setToken(HeroNexus);
 			}
 		}
 		int numOfKoulou = (int)(totalTile*perKoulou);
@@ -66,34 +66,44 @@ public class QuestBoard extends Board{
 		
 	
 	}
-	public QuestBoard(TheQuestOfLegends gameState) {
-		this();
-		setGame(gameState);
-		heroes = game.getHeroes();
-		monsters = game.getMonsters();
-		for(int i = 0; i< 3; i++) {
-			
-		}
+	//public QuestBoard(TheQuestOfLegends gameState) {
+	//	this();
+	//	setGame(gameState);
+	//	heroes = game.getHeroes();
+	//	monsters = game.getMonsters();
+	//	for(int i = 0; i< 3; i++) {
+	//		
+	//	}
 //		for(int i=0; i<3;i++){
 //			layout[][].setToken(heroes.get(i));
 //			layout[][].setToken(monsters.get(i));
 //			
 //		}
-	}
+	//}
 
 	public int[][] getHeroCoords() {
 		return heroCoords;
 	}
 
-	public int getCurHero() {
-		return curHero;
+	public Hero getCurHero() {
+		return heroes.get(curHero);
 	}
 
-	private void setCurHero(int num) {
+	public void setCurHero(int num) {
 		if(num>= heroes.size() || num < 0) {
 			throw new IllegalArgumentException();
 		}
 		curHero = num;
+	}
+	public Monster getCurMonster() {
+		return monsters.get(curMonster);
+	}
+
+	public void setCurMonster(int num) {
+		if(num>= monsters.size() || num < 0) {
+			throw new IllegalArgumentException();
+		}
+		curMonster = num;
 	}
 	public void nextTurn() {
 		if(curHero+1 >= heroes.size()) {
@@ -101,6 +111,14 @@ public class QuestBoard extends Board{
 		}
 		else {
 			setCurHero(curHero+1);
+		}
+	}
+	public void nextMonster() {
+		if(curMonster+1 >= monsters.size()) {
+			setCurMonster(0);
+		}
+		else {
+			setCurMonster(curMonster+1);
 		}
 	}
 	public void prevTurn() {
@@ -124,6 +142,134 @@ public class QuestBoard extends Board{
 			}
 		}
 	}
+	public boolean monsterNearby() {
+		boolean near = false;
+		int heroRow = heroCoords[curHero][0];
+		int heroCol = heroCoords[curHero][1];
+		boolean sameTile, inFront = false , nextTo = false;
+		sameTile = hasMonster(heroRow, heroCol);
+		if(heroRow-1 >= 0) {
+			inFront = hasMonster(heroRow-1, heroCol);
+		}
+		if(heroCol-1 >= 0) {
+			nextTo = hasMonster(heroRow, heroCol-1);
+		}
+		if(nextTo == false && heroCol +1 < this.getWidth()) {
+			nextTo = hasMonster(heroRow, heroCol+1);
+		}
+		return (sameTile || nextTo || inFront);
+	}
+	
+	public Monster getMonsterNearby() {
+		int heroRow = heroCoords[curHero][0];
+		int heroCol = heroCoords[curHero][1];
+		int monsterRow = 0;
+		int monsterCol = 0;
+		boolean sameTile, inFront = false , nextTo = false;
+		sameTile = hasMonster(heroRow, heroCol);
+		int[] arr = {-1,-1};
+		if(sameTile) {
+			arr[0] = heroRow;
+			arr[1] = heroCol;
+			return getMonsterFromCoord(arr);
+		}
+		if(heroRow-1 >= 0) {
+			inFront = hasMonster(heroRow-1, heroCol);
+			if(inFront) {
+				arr[0] = heroRow-1;
+				arr[1] = heroCol;
+				return getMonsterFromCoord(arr);
+			}
+		}
+		if(heroCol-1 >= 0) {
+			nextTo = hasMonster(heroRow, heroCol-1);
+			if(nextTo) {
+				arr[0] = heroRow;
+				arr[1] = heroCol-1;
+				return getMonsterFromCoord(arr);
+			}
+		}
+		if(nextTo == false && heroCol +1 < this.getWidth()) {
+			nextTo = hasMonster(heroRow, heroCol+1);
+			if(nextTo) {
+				arr[0] = heroRow;
+				arr[1] = heroCol+1;
+				return getMonsterFromCoord(arr);
+			}
+		}
+		return new Dragon();
+		
+	}
+	public GamePiece getCurTileType() {
+		int heroRow = heroCoords[curHero][0];
+		int heroCol = heroCoords[curHero][1];
+		if(this.layout[heroRow][heroCol].hasToken()) {
+			 List<GamePiece> toks = this.layout[heroRow][heroCol].getTokens();
+			 for(int i = 0; i< toks.size(); i++) {
+				 if(toks.get(i).equals(HeroNexus)) {
+					 return HeroNexus;
+				 }
+				 if(toks.get(i).equals(monsterNexus)) {
+					 return monsterNexus;
+				 }
+				 if(toks.get(i).equals(Plain)) {
+					 return Plain;
+				 }
+				 if(toks.get(i).equals(Cave)) {
+					 return Cave;
+				 }
+				 if(toks.get(i).equals(Bush)) {
+					 return Bush;
+				 }
+				 if(toks.get(i).equals(Koulou)) {
+					 return Koulou;
+				 }
+				 if(toks.get(i).equals(nonAccessible)) {
+					 return nonAccessible;
+				 }
+				 
+			 }
+		}
+		return Plain;
+	}
+	public int getCurHeroIndex() {
+		return curHero;
+	}
+	public void deleteMonsterFromBoard(Monster m) {
+		int inx = monsters.indexOf(m);
+		monsters.remove(m);
+		int s = monsterCoords.length;
+		int[][] temp = new int[s-1][2];
+		int j = 0;
+		for(int i = 0; i<s; i++) {
+			if(i != inx) {
+				temp[j] = monsterCoords[i];
+				j++;
+			}
+		}
+		
+	}
+	public Monster getMonsterFromCoord(int[] coords) {
+		for(int i = 0; i< monsters.size(); i++) {
+			if(monsterCoords[i][0] == coords[0] && monsterCoords[i][1] == coords[1]) {
+				return monsters.get(i);
+			}
+		}
+		return new Dragon();
+	}
+	public boolean hasMonster(int row, int col) {
+		boolean ret = false;
+		if(!layout[row][col].hasToken()) {
+			return false;
+		}
+		List<GamePiece> tokens = layout[row][col].getTokens();
+		for(int i = 0; i< tokens.size(); i++) {
+			if(tokens.get(i).equals(monsterToken)) {
+				ret = true;
+			}
+		}
+		return ret;
+	}
 
 	public void spawnHeroes(List<Hero> h) {
 		heroes = h;
@@ -140,17 +286,8 @@ public class QuestBoard extends Board{
 		}
 	}
 
-	public void spawnMonsters() {
-		int j=0;
-		for(int i=0; i<3;i++) {
-			GamePiece token = monsterTokens[i];
-			// setting row val 
-			monsterCoords[i][0] = 0;
-			monsterCoords[i][1] = j;
-			// Sets the next monster three cols apart 
-			layout[0][j].setToken(token);
-			j += 3;
-		}
+	public void spawnMonsters(List<Monster> m) {
+		addNewMonsters(m);
 	}
 
 	public void setGame(TheQuestOfLegends gameState) {
@@ -159,21 +296,35 @@ public class QuestBoard extends Board{
 
 	public void undo() {
 		if(lastMove.compareToIgnoreCase("up")==0) {
-			prevTurn();
+			//prevTurn();
 			moveDown();
 		}
 		else if(lastMove.compareToIgnoreCase("down")==0) {
-			prevTurn();
+			//prevTurn();
 			moveUp();
 		}
 		else if(lastMove.compareToIgnoreCase("left")==0) {
-			prevTurn();
+			//prevTurn();
 			moveRight();
 		}
 		else if(lastMove.compareToIgnoreCase("right")==0) {
-			prevTurn();
+			//prevTurn();
 			moveLeft();
 		}
+	}
+	public List<Monster> getMonsters(){
+		return monsters;
+	}
+	public void monsterMove() {
+		int monsterRow = monsterCoords[curMonster][0];
+		int monsterCol = monsterCoords[curMonster][1];
+		if(monsterRow+1 >= this.getHeight()) {
+			throw new IllegalArgumentException();
+		}
+		this.layout[monsterRow][monsterCol].removeToken(monsterToken);
+		monsterCoords[curMonster][0] = monsterRow+1;
+		this.layout[monsterRow+1][monsterCol].setToken(monsterToken);
+		return;
 	}
 
 	public GamePiece moveUp() {
@@ -188,7 +339,7 @@ public class QuestBoard extends Board{
 		this.layout[heroRow-1][heroCol].setToken(heroToken);
 		heroCoords[curHero][0] = heroRow-1;
 		lastMove = "up";
-		nextTurn();
+		//nextTurn();
 		return token;
 	}
 
@@ -204,7 +355,7 @@ public class QuestBoard extends Board{
 		this.layout[heroRow+1][heroCol].setToken(heroToken);
 		heroCoords[curHero][0] = heroRow+1;
 		lastMove = "down";
-		nextTurn();
+		//nextTurn();
 		return token;
 	}
 
@@ -220,7 +371,7 @@ public class QuestBoard extends Board{
 		this.layout[heroRow][heroCol-1].setToken(heroToken);
 		heroCoords[curHero][1] = heroCol-1;
 		lastMove = "left";
-		nextTurn();
+		//nextTurn();
 		return token;
 	}
 
@@ -236,8 +387,71 @@ public class QuestBoard extends Board{
 		this.layout[heroRow][heroCol+1].setToken(heroToken);
 		heroCoords[curHero][1] = heroCol+1;
 		lastMove = "right";
-		nextTurn();
+		//nextTurn();
 		return token;
+	}
+	public GamePiece returnToHeroNexus() {
+		int heroRow = heroCoords[curHero][0];
+		int heroCol = heroCoords[curHero][1];
+		GamePiece heroToken = heroTokens[curHero];
+		this.layout[heroRow][heroCol].removeToken(heroToken);
+		GamePiece token = this.layout[this.getHeight()-1][heroCol].getToken();
+		heroCoords[curHero][0] = this.getHeight()-1;
+		this.layout[this.getHeight()-1][heroCol].setToken(heroToken);
+		lastMove = "nexus";
+		//nextTurn();
+		return token;
+	}
+	public GamePiece teleport(int col) {
+		int heroRow = heroCoords[curHero][0];
+		int heroCol = heroCoords[curHero][1];
+		GamePiece heroToken = heroTokens[curHero];
+		this.layout[heroRow][heroCol].removeToken(heroToken);
+		GamePiece token = this.layout[heroRow][col].getToken();
+		heroCoords[curHero][1] = col;
+		this.layout[heroRow][col].setToken(heroToken);
+		lastMove = "teleport";
+		//nextTurn();
+		return token;
+		
+	}
+	public void addNewMonsters(List<Monster> m) {
+		int s = monsters.size();
+		monsters.addAll(m);
+		int[][] temp = new int[s+m.size()][2];
+		for(int i = 0; i<s; i++) {
+			temp[i] = monsterCoords[i];
+		}
+		int j=0;
+		for(int i=0; i<3;i++) {
+			GamePiece token = monsterToken;
+			// setting row val 
+			temp[i+s][0] = 0;
+			temp[i+s][1] = j;
+			// Sets the next monster three cols apart 
+			layout[0][j].setToken(token);
+			j += 3;
+		}
+		
+		monsterCoords = temp;
+	}
+	public boolean checkHeroWin() {
+		boolean win = false;
+		for(int i=0; i< heroCoords.length; i++) {
+			if(heroCoords[i][0] == 0) {
+				win = true;
+			}
+		}
+		return win;
+	}
+	public boolean checkMonsterWin() {
+		boolean win = false;
+		for(int i=0; i< monsterCoords.length; i++) {
+			if(monsterCoords[i][0] == this.getHeight()-1) {
+				win = true;
+			}
+		}
+		return win;
 	}
 	
 	

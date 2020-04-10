@@ -50,6 +50,9 @@ public class BoardTile {
 		return new GamePiece("  ","", 100);
 		
 	}
+	public List<GamePiece> getTokens(){
+		return this.token;
+	}
 	public boolean hasToken() {
 		return(token.size() != 0);
 	}

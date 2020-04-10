@@ -84,6 +84,12 @@ public abstract class Monster extends LivingCreature implements Fightable {
 		}
 		hero.decreaseMana(spell.getManaNeeded());
 	}
+	public boolean equals(Monster m) {
+		if(this.getClass() == m.getClass() && this.getName() == m.getName() && this.getLevel() == m.getLevel()) {
+			return true;
+		}
+		return false;
+	}
 
 	public abstract void setSkills(double baseDamage, double defense, double dodgeChance);
 }
