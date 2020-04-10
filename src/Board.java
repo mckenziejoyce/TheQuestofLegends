@@ -14,7 +14,6 @@ public class Board {
 	private int tileW = 3;
 	
 	
-	
 	//Constructors 
 	public Board() {
 		layout = null;

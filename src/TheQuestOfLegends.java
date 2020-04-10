@@ -21,10 +21,11 @@ public class TheQuestOfLegends {
 	private GamePiece Bush = new GamePiece(" B ","Bush",4);
 	private GamePiece Koulou = new GamePiece(" K ","Koulou",5);
 	private GamePiece Cave = new GamePiece(" C ","Cave",4);
-	private int fightProb = 75;
+	private int fightProb = 75; //delete
 	boolean inFight;
 	private int playersPerTeam = 3;
 	Random rand = new Random();
+	boolean play; //true when game is still being played
 	
 	TheQuestOfLegends(){
 		herotxt = "src/heroes.txt";
@@ -51,6 +52,7 @@ public class TheQuestOfLegends {
 		System.out.println(this.world);
 	}
 	public void playGame() throws FileNotFoundException{
+		play = true;
 		startGame();
 	}
 	public void startGame() throws FileNotFoundException {
@@ -61,8 +63,8 @@ public class TheQuestOfLegends {
 				" ____/_____\\__\\@  @/___/_____\\____ \n" + 
 				"|             |\\../|              |\n" + 
 				"|              \\VV/               |\n" + 
-				"| Welcome to The Quest of Legends |\n" + 
-				"|_________________________________|\n" + 
+				"| Welcome to The Quest of Legends  |\n" + 
+				"|__________________________________|\n" + 
 				" |    /\\ /      \\\\       \\ /\\    | \n" + 
 				" |  /   V        ))       V   \\  | \n" + 
 				" |/     `       //        '     \\| \n" + 
@@ -77,9 +79,307 @@ public class TheQuestOfLegends {
 		System.out.println("When looking at the map you will see C for common tiles, M for marketplaces, N for tiles you cant visit, and a * to show where you are");
 		System.out.println("Now that we've covered the basic rules lets start playing");
 		System.out.println(world);
-		
+
 	}
-	public List<Monster> generateMonsters() throws FileNotFoundException{
+	//goes through all three heros selecting their moves in rounds 
+	public void rounds() {
+		while(play){
+			for (int i=0; i< world.getHeroCoords().length; i++){
+				world.curHero= i;
+				move(world.getHeroCoords()[i]);
+	}
+	}
+}
+
+	//hero choses move
+	public boolean move(int[] heroPos) {
+		System.out.println("Make your move");
+		boolean valid = false;
+		GamePiece tileType = new GamePiece();
+		while(!valid) {
+			String resp = userResponse.next();
+			if(resp.compareToIgnoreCase("w")==0) {
+				tileType = world.moveUp();
+				valid = true;
+				addBoost(tileType);
+			}
+			else if(resp.compareToIgnoreCase("a")==0) {
+				tileType = world.moveLeft();
+				valid = true;
+				addBoost(tileType);
+			}
+			else if(resp.compareToIgnoreCase("s")==0) {
+				tileType = world.moveDown();
+				valid = true;
+				addBoost(tileType);
+			}
+			else if(resp.compareToIgnoreCase("d")==0) {
+				tileType = world.moveRight();
+				valid = true;
+				addBoost(tileType);
+			}
+			else if(resp.compareToIgnoreCase("i")==0) {
+				showInformation();
+			}
+			else if(resp.compareToIgnoreCase("q")==0) {
+				quitGame();
+			}
+			else if(resp.compareToIgnoreCase("v")==0) {
+				displayInv();
+			}
+			else if(resp.compareToIgnoreCase("p")==0) {
+				potion(heroes.get(world.curHero));
+			}
+			else if(resp.compareToIgnoreCase("b")==0) {
+				openMarket(heroes.get(world.curHero));
+				move(heroPos);//buying and selling dont count as moves so we do a move after
+
+			}
+			else if(resp.compareToIgnoreCase("m")==0) {
+				System.out.println(world);
+			}
+			else {
+				System.out.println("Sorry not a valid move :( "+"To move: \n W/w: move up\n" + "A/a: move left\n" + "S/s: move down\n" + "D/d: move right");
+			}
+		}
+		if(monsterNearby(heroPos)) {
+				System.out.println("              .7\n" + 
+						"            .'/\n" + 
+						"           / /\n" + 
+						"          / /\n" + 
+						"         / /\n" + 
+						"        / /\n" + 
+						"       / /\n" + 
+						"      / /\n" + 
+						"     / /         \n" + 
+						"    / /          \n" + 
+						"  __|/\n" + 
+						",-\\__\\\n" + 
+						"|f-\"Y\\|\n" + 
+						"\\()7L/\n" + 
+						" cgD                            __ _\n" + 
+						" |\\(                          .'  Y '>,\n" + 
+						"  \\ \\                        / _   _   \\\n" + 
+						"   \\\\\\                       )(_) (_)(|}\n" + 
+						"    \\\\\\                      {  4A   } /\n" + 
+						"     \\\\\\                      \\uLuJJ/\\l\n" + 
+						"      \\\\\\                     |3    p)/\n" + 
+						"       \\\\\\___ __________      /nnm_n//\n" + 
+						"       c7___-__,__-)\\,__)(\".  \\_>-<_/D\n" + 
+						"                  //V     \\_\"-._.__G G_c__.-__<\"/ ( \\\n" + 
+						"                         <\"-._>__-,G_.___)\\   \\7\\\n" + 
+						"                        (\"-.__.| \\\"<.__.-\" )   \\ \\\n" + 
+						"                        |\"-.__\"\\  |\"-.__.-\".\\   \\ \\\n" + 
+						"                        (\"-.__\"\". \\\"-.__.-\".|    \\_\\\n" + 
+						"                        \\\"-.__\"\"|!|\"-.__.-\".)     \\ \\\n" + 
+						"                         \"-.__\"\"\\_|\"-.__.-\"./      \\ l\n" + 
+						"                          \".__\"\"\">G>-.__.-\">       .--,_\n" + 
+						"                              \"\"  G");
+				System.out.println("You have encountered a monster!");
+				//boolean heroWin = fight(); //implement later
+			
+		}
+		if(tileType.equals(Nexus)) {
+				System.out.println("            _,='\"`\"`--._         |  |   |      /    '.  '. \n" + 
+			"        ,=''      <>    `-.     /   \\  /     .' / /   \\   \\ \n" + 
+			"     ,='     <>       <>   `-. |    |  \\    / .'  |  /|   | \n" + 
+			"   ,' <>                   _.=`-.  /    |  /  |  /  / \\   \\ \n" + 
+			" .'     <>     <>   _..==='   ,=' |     \\ |  /  |  |   |   \\ \n" + 
+			"/    <>         _.='       ,='   /\\      /   |  \\ / \\   \\  | \n" + 
+			"|           _.='        ,=' /   |  |    |   /    |  |   |  \\ \n" + 
+			"\\  <>   _.='         ,='   |    \\   \\  /    |    /   \\  \\  | \n" + 
+			"/    .='             T    /     |   |  |    \\   |    |  /  | \n" + 
+			"| _,='                L  |   .---------------------------. \n" + 
+			".``  _..J      :       J/  ,'   __           __         .'. \n" + 
+			" `--=   F      '       F  /   ,'`.`.       ,'`.`.      / _ \\ \n" + 
+			"       L      .        I,'   |_|_|.|      |_|_|.|    ,' |_| `. \n" + 
+			"        J     :        /     |_|_|.'      |_|_|.'   /   |_|   \\ \n" + 
+			"`._      ;    '      ,'___________________________,'          |\\ \n" + 
+			"   `-.   F    :      ============================='   =.   .='| \n" + 
+			"`-.   \\  L    .        |=.:   =: ______     .=:'|             | \n" + 
+			"-. \\   \\  J    '       |  ___   |      |        |.='  _.-. `='| \n" + 
+			" `. \\  |  ;    :       | |   | =|      |=' ___  |    |   |    | \n" + 
+			"  | |  |  L    '       | |   |  |      |  |   | |    |   |    | \n" + 
+			"   \\ \\ |  J _.='\"'-._  | '---'  |     O|  |   | |    |_.-'  =\"| \n" + 
+			"    \\__/..-'         '-|.='   ='|      |= '---' |      .=     | \n" + 
+			"_.--'\"\"'               '---...._|      |        |.='        _.' \n" + 
+			"                   O          .' `--.._|    -`=:|      =._.' \n" + 
+			"                  /<         [`--..__.']`-._ .=-|=   _.-' \n" + 
+			"                  \\\\     _.-'  o ..__]'     `=._|_.-' \n" + 
+			"                  // _.-'\"'-._ |>_.-' \n" + 
+			"                _.--='     _.-'/\\       .---^---. \n" + 
+			"           _..-' '\"'-._ _.-'            |Welcome| \n" + 
+			"     _..-'\"`---..._ _.-'                |to the | \n" + 
+			".-=\"'`---..__  _..-'                    | Market| \n" + 
+			".._       _..-'                         |____ __| \n" + 
+			"   '-._.-'                                  |/ \n" + 
+			" _.-'                                    ---^^-- ");
+			System.out.println("Welcome to the market where you can buy/sell potions, weapons, armors, and spells!");
+
+			openMarket(heroes.get(world.curHero));
+			move(heroPos);//buying and selling dont count as moves so we do a move after
+			
+		}
+		if(tileType.equals(nonAccessible)) {
+			System.out.println("Sorry not a valid move :( , that tile is non accessible try another move");
+			world.undo();
+			return false;
+		}
+		return true;
+	}
+	//or should we only display current hero's stats?
+	public void showInformation() {
+		System.out.println("\n Information: ");
+		System.out.println("Heroes: ");
+		for(Hero hero: heroes) {
+			System.out.println(hero);
+		}
+		if(monsterNearby(world.getHeroCoords()[world.curHero])) { //Need to fix, figure out how code underneath works later 
+			System.out.println("Monsters: ");
+			for(Monster m: monsters) {
+				if(m.isFighting()) {
+					System.out.println(m);
+				}
+			}
+		}
+		System.out.println("\n");
+	}
+
+	public void quitGame() {
+		System.out.println("Thanks for Playing! After playing your Hero(es) stats are");
+		play=false;//take out later
+		for(Hero hero: heroes) {
+			System.out.print(hero);
+		}
+		System.exit(0);
+	}
+
+	private boolean monsterNearby(int [] heroPos) {
+
+		int row= heroPos[0];
+		int col= heroPos[1];
+		for (int i=0; i<getHeroNearbyTiles(row, col).length; i++){
+			 //implement later
+		}
+		return false;
+	}
+
+	private int[][] getHeroNearbyTiles(int row, int col) {
+		int[][] nearbyTiles= new int[5][2];
+		nearbyTiles[0]= new int[] {row-1, col-1};
+		nearbyTiles[1]= new int[] {row-1, col};
+		nearbyTiles[2]= new int[] {row-1, col+1};
+		nearbyTiles[3]= new int[] {row, col-1};
+		nearbyTiles[4]= new int[] {row, col+1};
+		return nearbyTiles;
+	}
+
+
+	private void addBoost(GamePiece tileType){
+		if(tileType.equals(Bush)){
+			heroes.get(world.curHero).increaseDexerityPercent(10);
+		}else if(tileType.equals(Koulou)){
+			heroes.get(world.curHero).increaseStrengthPercent(10);
+		}else if(tileType.equals(Cave)){
+			heroes.get(world.curHero).increaseAgilityPercent(10);
+		}else{}
+	}
+
+	public void potion(Hero hero) {
+		System.out.println("You have decided to use a potion, please select the number of the potion you want to use");
+		for(int i=0; i <hero.getPotions().size(); i++) {
+			System.out.println("Potion "+ Integer.toString(i)+":");
+			System.out.println(hero.getPotions().get(i));
+		}
+		int resp = userResponse.nextInt();
+		while(resp >hero.getPotions().size() || resp < 0) {
+			System.out.println("Im sorry thats not an option try again");
+			resp = userResponse.nextInt();
+		}
+		Potion potion = hero.getPotions().get(resp);
+		hero.usePotion(potion);
+	}
+	//should we only display current hero inventory?
+	public void displayInv() {
+		System.out.println("The inventories for your Heros are:");
+		for(Hero h: heroes) {
+			System.out.println(h.getName()+":");
+			System.out.println("Weapons:"+h.getWeapons());
+			System.out.println("Armors:"+h.getArmors());
+			System.out.println("Spells:"+h.getSpells());
+			System.out.println("Potions:"+h.getPotions());
+		}
+	}
+
+	public void openMarket(Hero h) {
+		
+		Market mar = h.getMarket();
+		mar.welcomeToMarket();
+		System.out.println("Would you like to buy something? (Type Y/y for yes and N/n for no)");
+		
+		boolean valid = false;
+		while(!valid) {
+			String resp = userResponse.next();
+			if(resp.compareToIgnoreCase("y")==0) {
+				mar.buyObjects(h);
+				valid = true;
+			}
+			else if(resp.compareToIgnoreCase("n")==0) {
+				valid=true;
+				break;
+			}
+			else if(resp.compareToIgnoreCase("i")==0) {
+				showInformation();
+			}
+			else if(resp.compareToIgnoreCase("q")==0) {
+				quitGame();
+			}
+			else if(resp.compareToIgnoreCase("v")==0) {
+				displayInv();
+			}
+			else if(resp.compareToIgnoreCase("p")==0) {
+				potion(h);
+			}
+			else if(resp.compareToIgnoreCase("m")==0) {
+				System.out.println(world);
+			}
+			else {
+				System.out.println("Please enter a valid command");
+			}
+		}
+		System.out.println("Would you like to sell something?(Type Y/y for yes and N/n for no)");
+		valid = false;
+		while(!valid) {
+			String resp = userResponse.next();
+			if(resp.compareToIgnoreCase("y")==0) {
+				mar.sellObjects(h);
+				valid = true;
+			}
+			else if(resp.compareToIgnoreCase("n")==0) {
+				valid=true;
+				break;
+			}
+			else if(resp.compareToIgnoreCase("i")==0) {
+				showInformation();
+			}
+			else if(resp.compareToIgnoreCase("q")==0) {
+				quitGame();
+			}
+			else if(resp.compareToIgnoreCase("v")==0) {
+				displayInv();
+			}
+			else if(resp.compareToIgnoreCase("p")==0) {
+				potion(h);
+			}
+			else if(resp.compareToIgnoreCase("m")==0) {
+				System.out.println(world);
+			}
+			else {
+				System.out.println("Please enter a valid command");
+			}
+		}
+	}
+	public List<Monster> generateMonsters() throws FileNotFoundException {
 		List<String> strRep = new ArrayList<String>();
 		List<Monster> monsters = new ArrayList<Monster>();
 		File file = new File(monstertxt); 

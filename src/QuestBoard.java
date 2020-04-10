@@ -20,7 +20,7 @@ public class QuestBoard extends Board{
 	// Each hero has an array [row index,col index]
 	private int[][] heroCoords = new int[3][2];
 	private int[][] monsterCoords = new int[3][2];
-	private int curHero = 0;
+	public int curHero = 0;
 	private GamePiece nonAccessible = new GamePiece("XXX","NonAcc",-1);
 	private GamePiece Nexus = new GamePiece(" N ","Nexus",11);
 	private GamePiece Plain = new GamePiece(" P ","Plain",3);
@@ -34,7 +34,6 @@ public class QuestBoard extends Board{
 	private int heroRow;
 	private int heroCol;
 	private GamePiece heroTeam = new GamePiece(" * ","Heroes", 5);
-	
 	
 	public QuestBoard() {
 		super(8);
@@ -81,6 +80,15 @@ public class QuestBoard extends Board{
 //			
 //		}
 	}
+
+	public int[][] getHeroCoords() {
+		return heroCoords;
+	}
+
+	public int getCurHero() {
+		return curHero;
+	}
+
 	private void setCurHero(int num) {
 		if(num>= heroes.size() || num < 0) {
 			throw new IllegalArgumentException();
@@ -116,6 +124,7 @@ public class QuestBoard extends Board{
 			}
 		}
 	}
+
 	public void spawnHeroes(List<Hero> h) {
 		heroes = h;
 		int j=0;
@@ -130,6 +139,7 @@ public class QuestBoard extends Board{
 			j += 3;
 		}
 	}
+
 	public void spawnMonsters() {
 		int j=0;
 		for(int i=0; i<3;i++) {
@@ -146,6 +156,7 @@ public class QuestBoard extends Board{
 	public void setGame(TheQuestOfLegends gameState) {
 		game = gameState;
 	}
+
 	public void undo() {
 		if(lastMove.compareToIgnoreCase("up")==0) {
 			prevTurn();
@@ -164,6 +175,7 @@ public class QuestBoard extends Board{
 			moveLeft();
 		}
 	}
+
 	public GamePiece moveUp() {
 		int heroRow = heroCoords[curHero][0];
 		int heroCol = heroCoords[curHero][1];
@@ -179,6 +191,7 @@ public class QuestBoard extends Board{
 		nextTurn();
 		return token;
 	}
+
 	public GamePiece moveDown() {
 		int heroRow = heroCoords[curHero][0];
 		int heroCol = heroCoords[curHero][1];
@@ -194,6 +207,7 @@ public class QuestBoard extends Board{
 		nextTurn();
 		return token;
 	}
+
 	public GamePiece moveLeft() {
 		int heroRow = heroCoords[curHero][0];
 		int heroCol = heroCoords[curHero][1];
@@ -209,6 +223,7 @@ public class QuestBoard extends Board{
 		nextTurn();
 		return token;
 	}
+
 	public GamePiece moveRight() {
 		int heroRow = heroCoords[curHero][0];
 		int heroCol = heroCoords[curHero][1];
@@ -224,7 +239,6 @@ public class QuestBoard extends Board{
 		nextTurn();
 		return token;
 	}
-	
 	
 	
 }
