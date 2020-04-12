@@ -13,9 +13,6 @@ public class TheQuestOfLegends {
 	private GamePiece heroOne = new GamePiece("*H1","HeroOne",5);
 	private GamePiece heroTwo = new GamePiece("*H2","HeroTwo",5);
 	private GamePiece heroThree = new GamePiece("*H3","HeroThree",5);
-	private GamePiece monsterOne = new GamePiece(" M1","MonsterOne",5);
-	private GamePiece monsterTwo = new GamePiece(" M2","MonsterTwo",5);
-	private GamePiece monsterThree = new GamePiece(" M3","MonsterThree",5);
 	private GamePiece HeroNexus = new GamePiece(" N ","Nexus",11);
 	private GamePiece monsterNexus = new GamePiece(" N ","Nexus",12);
 	private GamePiece Plain = new GamePiece(" P ","Plain",3);
@@ -28,7 +25,7 @@ public class TheQuestOfLegends {
 	Random rand = new Random();
 	boolean play; //true when game is still being played
 	
-	private int monsterSpawn = 8;
+	private int monsterSpawn = 4;
 	
 	TheQuestOfLegends(){
 		herotxt = "src/heroes.txt";
@@ -45,33 +42,6 @@ public class TheQuestOfLegends {
 		
 	}
 	
-	
-	public void playGame() throws FileNotFoundException{
-		play = true;
-		startGame();
-		int roundsPerMonsterSpawn = 8;
-		int roundCount = 1;
-		boolean heroWin = world.checkHeroWin();
-		boolean monsterWin = world.checkMonsterWin();
-		heroRounds(); 
-		while(!heroWin && !monsterWin) {
-			monsterRounds();
-			heroRounds(); 
-			if(roundCount % roundsPerMonsterSpawn == 0) {
-				chooseMonsters();
-			}
-			heroWin = world.checkHeroWin();
-			monsterWin = world.checkMonsterWin();
-			roundCount++;
-		}
-		if(monsterWin && !heroWin) {
-			System.out.println("Sorry a monster reached the hero Nexus you lose");
-		}
-		else {
-			System.out.println("Congrats a hero reached the monster Nexus, you win!");
-		}
-		
-	}
 	public void startGame() throws FileNotFoundException {
 		//System.out.println(ANSI_RED +"Welcome to the Quest!"+ ANSI_RESET);
 		System.out.println("        ,     \\    /      ,        \n" + 
@@ -95,19 +65,38 @@ public class TheQuestOfLegends {
 				"Q/q: Quit the game\n"+"V/v: Display inventories\n"+"C/c: Change weapon or armor\n"+"P/p: Consume Potion\n"+"M/m: Display the Map\n");
 		System.out.println("When looking at the map you will see C for common tiles, M for marketplaces, N for tiles you cant visit, and a * to show where you are");
 		System.out.println("Now that we've covered the basic rules lets start playing");
-		System.out.println(world);
-
 	}
-	//goes through all three heros selecting their moves in rounds 
-//	public void rounds() {
-//		while(play){
-//			for (int i=0; i< world.getHeroCoords().length; i++){
-//				world.curHero= i;
-//				
-//				//move(world.getHeroCoords()[i]);
-//			}
-//	}
-//}
+	
+	public void playGame() throws FileNotFoundException{
+		play = true;
+		startGame();
+		
+		int roundCount = 1;
+		boolean heroWin = world.checkHeroWin();
+		boolean monsterWin = world.checkMonsterWin();
+		heroRounds(); 
+		while(!heroWin && !monsterWin) {
+			if(roundCount % monsterSpawn == 0) {
+				chooseMonsters();
+			}
+			else {
+				monsterRounds();
+			}
+			heroRounds(); 
+			
+			heroWin = world.checkHeroWin();
+			monsterWin = world.checkMonsterWin();
+			roundCount++;
+		}
+		if(monsterWin && !heroWin) {
+			System.out.println("Sorry a monster reached the hero Nexus you lose");
+		}
+		else {
+			System.out.println("Congrats a hero reached the monster Nexus, you win!");
+		}
+		
+	}
+	
 	public void monsterRounds() {
 		world.setCurMonster(0);
 		List<Monster> activeMonsters = world.getMonsters();
@@ -116,9 +105,6 @@ public class TheQuestOfLegends {
 			for(int j = 0; j<heroes.size(); j++) {
 				world.setCurHero(j);
 				nearHero = world.monsterNearby();
-				if(nearHero) {
-					break;
-				}
 			}
 			if(nearHero) {
 				Hero h = world.getCurHero();
@@ -133,19 +119,17 @@ public class TheQuestOfLegends {
 		}
 		
 	}
+	
 	public void heroRounds() {
 		world.setCurHero(0);
+		boolean usedMove = false;
 		for(Hero hero: heroes) {
-//			GamePiece toke = world.getCurTileType();
-//			if(toke.equals(HeroNexus)) {
-//				openMarket(heroes.get(world.curHero));
-//			}
+			usedMove = false;
 			System.out.println(world);
 			hero.roundRenewal();
-			boolean usedMove = false;
 			while(!usedMove) {
 				if(world.monsterNearby()) {
-					System.out.println("Would you like to move/shop or fight the nearby monster (type m for move/shop and f for fight)");
+					System.out.println("Hero "+ (world.getCurHeroIndex()+1)+", Would you like to move/shop or fight the nearby monster (type m for move/shop and f for fight)");
 					String resp = userResponse.next();
 					if(resp.compareToIgnoreCase("m")==0) {
 						usedMove = move();
@@ -153,12 +137,19 @@ public class TheQuestOfLegends {
 					else if(resp.compareToIgnoreCase("f")==0) {
 						usedMove = fight(hero);
 					}
-					
+					else if(resp.compareToIgnoreCase("i")==0) {
+						showInformation();
+					}
+					else if(resp.compareToIgnoreCase("q")==0) {
+						quitGame();
+					}
+					else if(resp.compareToIgnoreCase("v")==0) {
+						displayInv();
+					}
 				}
 				else {
 					usedMove = move();
 				}
-				
 			}
 			if(!hero.isAlive()) {
 				hero.setHP();
@@ -169,7 +160,7 @@ public class TheQuestOfLegends {
 	}
 
 	public boolean move() {
-		System.out.println("Make your move");
+		System.out.println("Hero " + (world.getCurHeroIndex()+1)+ ", Make your move");
 		boolean valid = false;
 		GamePiece tileType = new GamePiece();
 		while(!valid) {
@@ -312,11 +303,11 @@ public class TheQuestOfLegends {
 				"                         \"-.__\"\"\\_|\"-.__.-\"./      \\ l\n" + 
 				"                          \".__\"\"\">G>-.__.-\">       .--,_\n" + 
 				"                              \"\"  G");
-		System.out.println("You have encountered a monster!");
+		System.out.println("Hero "+ (world.getCurHeroIndex()+1)+" you have encountered a monster!");
 		System.out.println(hero.getName()+" would you like to do a regular attack (type attack), cast a spell (type spell), use a potion (type potion), or change your armor/weapon (type change)?");
 		String resp = chooseFightMove(hero);
-		Monster monster = world.getMonsterNearby();
 		boolean valid = false;
+		Monster monster = world.getMonsterNearby();
 		if(resp.compareTo("change")==0) {
 			change(hero);
 			valid = true;
@@ -329,25 +320,28 @@ public class TheQuestOfLegends {
 		else if(resp.compareTo("attack")==0) {
 			double weaponDamage = attack(hero);
 			System.out.println("Attacking the nearest monster");
-			//int id = chooseMonster(monsteys);
 			int inx = monsters.indexOf(monster);
-			Monster m = monsters.get(inx);
-			m.getAttacked(weaponDamage);
-			if(!m.isAlive()) {
-				world.deleteMonsterFromBoard(monster);
+			if(inx != -1) {
+				Monster m = monsters.get(inx);
+				m.getAttacked(weaponDamage);
+				if(!m.isAlive()) {
+					world.deleteMonsterFromBoard(monster);
+				}
+				
 			}
 			valid = true;
 		}
 		else if(resp.compareTo("spell")==0) {
 			Spell spell = spell(hero);
 			System.out.println("Casting a spell on the nearest monster");
-			//int id = chooseMonster(monsteys);
-			//monsteys[id].getSpellEffect(hero,spell);
 			int inx = monsters.indexOf(monster);
-			Monster m = monsters.get(inx);
-			m.getSpellEffect(hero,spell);
-			if(!m.isAlive()) {
-				world.deleteMonsterFromBoard(monster);
+			if(inx != -1) {
+				Monster m = monsters.get(inx);
+				m.getSpellEffect(hero,spell);
+				if(!m.isAlive()) {
+					world.deleteMonsterFromBoard(monster);
+				}
+				
 			}
 			valid = true;
 		}
@@ -386,16 +380,6 @@ public class TheQuestOfLegends {
 		System.exit(0);
 	}
 
-//	private boolean monsterNearby(int [] heroPos) {
-//
-//		int row= heroPos[0];
-//		int col= heroPos[1];
-//		for (int i=0; i<getHeroNearbyTiles(row, col).length; i++){
-//			 //implement later
-//		}
-//		return false;
-//	}
-
 	private int[][] getHeroNearbyTiles(int row, int col) {
 		int[][] nearbyTiles= new int[5][2];
 		nearbyTiles[0]= new int[] {row-1, col-1};
@@ -405,7 +389,6 @@ public class TheQuestOfLegends {
 		nearbyTiles[4]= new int[] {row, col+1};
 		return nearbyTiles;
 	}
-
 
 	private void addBoost(GamePiece tileType){
 		if(tileType.equals(Bush)){
@@ -477,7 +460,7 @@ public class TheQuestOfLegends {
 		}
 		return ret;
 	}
-	//should we only display current hero inventory?
+	
 	public void displayInv() {
 		System.out.println("The inventories for your Heros are:");
 		for(Hero h: heroes) {
@@ -557,6 +540,7 @@ public class TheQuestOfLegends {
 			}
 		}
 	}
+	
 	public List<Monster> generateMonsters() throws FileNotFoundException {
 		List<String> strRep = new ArrayList<String>();
 		List<Monster> monsters = new ArrayList<Monster>();
@@ -592,7 +576,6 @@ public class TheQuestOfLegends {
         return monsters;
 	}
 	
-	
 	public void chooseMonsters()throws FileNotFoundException{
 		List<Monster> newMonsters = new ArrayList<Monster>();
 		List<Monster> monsterOptions = generateMonsters();
@@ -614,7 +597,6 @@ public class TheQuestOfLegends {
 		
 	}
 
-	
 	public void chooseHeroes() throws FileNotFoundException {
 		List<Hero> heroOptions = generateHereos();
 		int numberOfHeroes = playersPerTeam;
@@ -652,6 +634,7 @@ public class TheQuestOfLegends {
 		world.spawnHeroes(heroes);
 		
 	}
+	
 	public TheQuestOfLegends getGameState() {
 		return this;
 	}
@@ -659,6 +642,7 @@ public class TheQuestOfLegends {
 	public List<Hero> getHeroes(){
 		return heroes;
 	}
+	
 	public List<Monster> getMonsters(){
 		return monsters;
 	}
