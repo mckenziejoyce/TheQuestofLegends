@@ -1,6 +1,6 @@
 import java.io.*; 
 import java.util.*;
-import java.math.*;
+
 
 public class TheQuestOfLegends {
 	private String herotxt;
@@ -10,22 +10,15 @@ public class TheQuestOfLegends {
 	private QuestBoard world;
 	Scanner userResponse = new Scanner( System.in );
 	private GamePiece nonAccessible = new GamePiece("XXX","NonAcc",-1);
-	private GamePiece heroOne = new GamePiece("*H1","HeroOne",5);
-	private GamePiece heroTwo = new GamePiece("*H2","HeroTwo",5);
-	private GamePiece heroThree = new GamePiece("*H3","HeroThree",5);
 	private GamePiece HeroNexus = new GamePiece(" N ","Nexus",11);
-	private GamePiece monsterNexus = new GamePiece(" N ","Nexus",12);
-	private GamePiece Plain = new GamePiece(" P ","Plain",3);
 	private GamePiece Bush = new GamePiece(" B ","Bush",4);
 	private GamePiece Koulou = new GamePiece(" K ","Koulou",5);
 	private GamePiece Cave = new GamePiece(" C ","Cave",4);
-	private int fightProb = 75; //delete
 	boolean inFight;
 	private int playersPerTeam = 3;
 	Random rand = new Random();
 	boolean play; //true when game is still being played
 	private int roundCount = 1;
-	
 	private int monsterSpawn = 4;
 	
 	TheQuestOfLegends(){
@@ -40,7 +33,6 @@ public class TheQuestOfLegends {
 	public static void main(String[] args) throws FileNotFoundException{
 		TheQuestOfLegends game = new TheQuestOfLegends();
 		game.playGame();
-		
 	}
 	
 	public void startGame() throws FileNotFoundException {
@@ -133,7 +125,7 @@ public class TheQuestOfLegends {
 					openMarket(heroes.get(world.getCurHeroIndex()));;
 				}
 				if(world.monsterNearby()) {
-					System.out.println("Hero "+ (world.getCurHeroIndex()+1)+", Would you like to move or fight the nearby monster (type m for move/shop and f for fight)");
+					System.out.println("Hero "+ (world.getCurHeroIndex()+1)+", Would you like to move or fight the nearby monster (type m for move and f for fight)");
 					String resp = userResponse.next();
 					if(resp.compareToIgnoreCase("m")==0) {
 						usedMove = move();
@@ -472,7 +464,7 @@ public class TheQuestOfLegends {
 		mar.welcomeToMarket();
 		boolean cont = true;
 		while(cont) {
-			System.out.println("Would you like to buy something? (Type Y/y for yes and N/n for no)");
+			System.out.println("Hero "+ (world.getCurHeroIndex()+1)+ ", Would you like to buy something? (Type Y/y for yes and N/n for no)");
 			boolean valid = false;
 			while(!valid) {
 				String resp = userResponse.next();
@@ -598,7 +590,8 @@ public class TheQuestOfLegends {
 		int i =0;
 		while(i<playersPerTeam) {
 			int ri = rand.nextInt(monsterOptions.size());
-			if(monsterOptions.get(ri).getLevel() <= minlevel) {
+			boolean contains = activeMonster(monsterOptions.get(ri)) || newMonsters.contains(monsterOptions.get(ri));
+			if(monsterOptions.get(ri).getLevel() <= minlevel && !contains) {
 				monsters.add(monsterOptions.get(ri));
 				newMonsters.add(monsterOptions.get(ri));
 				i++;
@@ -608,6 +601,17 @@ public class TheQuestOfLegends {
 		
 	}
 
+	public boolean activeMonster(Monster m) {
+		boolean ret = false;
+		List<Monster> activeMonsters = world.getMonsters();
+		for(Monster monster : activeMonsters) {
+			if(m.equals(monster)) {
+				ret = true;
+			}
+		}
+		return ret;
+	}
+	
 	public void chooseHeroes() throws FileNotFoundException {
 		List<Hero> heroOptions = generateHereos();
 		int numberOfHeroes = playersPerTeam;
