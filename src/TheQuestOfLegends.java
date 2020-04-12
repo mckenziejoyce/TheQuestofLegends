@@ -24,6 +24,7 @@ public class TheQuestOfLegends {
 	private int playersPerTeam = 3;
 	Random rand = new Random();
 	boolean play; //true when game is still being played
+	private int roundCount = 1;
 	
 	private int monsterSpawn = 4;
 	
@@ -71,7 +72,7 @@ public class TheQuestOfLegends {
 		play = true;
 		startGame();
 		
-		int roundCount = 1;
+		roundCount = 1;
 		boolean heroWin = world.checkHeroWin();
 		boolean monsterWin = world.checkMonsterWin();
 		heroRounds(); 
@@ -128,8 +129,11 @@ public class TheQuestOfLegends {
 			System.out.println(world);
 			hero.roundRenewal();
 			while(!usedMove) {
+				if(world.getCurTileType().equals(HeroNexus) && roundCount != 1) {
+					openMarket(heroes.get(world.getCurHeroIndex()));;
+				}
 				if(world.monsterNearby()) {
-					System.out.println("Hero "+ (world.getCurHeroIndex()+1)+", Would you like to move/shop or fight the nearby monster (type m for move/shop and f for fight)");
+					System.out.println("Hero "+ (world.getCurHeroIndex()+1)+", Would you like to move or fight the nearby monster (type m for move/shop and f for fight)");
 					String resp = userResponse.next();
 					if(resp.compareToIgnoreCase("m")==0) {
 						usedMove = move();
@@ -255,10 +259,10 @@ public class TheQuestOfLegends {
 		".._       _..-'                         |____ __| \n" + 
 		"   '-._.-'                                  |/ \n" + 
 		" _.-'                                    ---^^-- ");
-		System.out.println("Welcome to the market where you can buy/sell potions, weapons, armors, and spells!");
+		System.out.println("Welcome to the market Hero "+(world.getCurHeroIndex()+1)+" where you can buy/sell potions, weapons, armors, and spells!");
 		openMarket(heroes.get(world.getCurHeroIndex()));
 		// this was a recursive call to move but i changed it to return false because that will make it not count as an action 
-		return false;
+		return true;
 		
 	}
 	if(tileType.equals(nonAccessible)) {
@@ -380,16 +384,6 @@ public class TheQuestOfLegends {
 		System.exit(0);
 	}
 
-	private int[][] getHeroNearbyTiles(int row, int col) {
-		int[][] nearbyTiles= new int[5][2];
-		nearbyTiles[0]= new int[] {row-1, col-1};
-		nearbyTiles[1]= new int[] {row-1, col};
-		nearbyTiles[2]= new int[] {row-1, col+1};
-		nearbyTiles[3]= new int[] {row, col-1};
-		nearbyTiles[4]= new int[] {row, col+1};
-		return nearbyTiles;
-	}
-
 	private void addBoost(GamePiece tileType){
 		if(tileType.equals(Bush)){
 			heroes.get(world.getCurHeroIndex()).increaseDexerityPercent(10);
@@ -476,67 +470,84 @@ public class TheQuestOfLegends {
 		
 		Market mar = h.getMarket();
 		mar.welcomeToMarket();
-		System.out.println("Would you like to buy something? (Type Y/y for yes and N/n for no)");
-		
-		boolean valid = false;
-		while(!valid) {
-			String resp = userResponse.next();
-			if(resp.compareToIgnoreCase("y")==0) {
-				mar.buyObjects(h);
-				valid = true;
+		boolean cont = true;
+		while(cont) {
+			System.out.println("Would you like to buy something? (Type Y/y for yes and N/n for no)");
+			boolean valid = false;
+			while(!valid) {
+				String resp = userResponse.next();
+				if(resp.compareToIgnoreCase("y")==0) {
+					mar.buyObjects(h);
+					valid = true;
+				}
+				else if(resp.compareToIgnoreCase("n")==0) {
+					valid=true;
+					break;
+				}
+				else if(resp.compareToIgnoreCase("i")==0) {
+					showInformation();
+				}
+				else if(resp.compareToIgnoreCase("q")==0) {
+					quitGame();
+				}
+				else if(resp.compareToIgnoreCase("v")==0) {
+					displayInv();
+				}
+				else if(resp.compareToIgnoreCase("p")==0) {
+					potion(h);
+				}
+				else if(resp.compareToIgnoreCase("m")==0) {
+					System.out.println(world);
+				}
+				else {
+					System.out.println("Please enter a valid command");
+				}
 			}
-			else if(resp.compareToIgnoreCase("n")==0) {
-				valid=true;
-				break;
+			System.out.println("Would you like to sell something?(Type Y/y for yes and N/n for no)");
+			valid = false;
+			while(!valid) {
+				String resp = userResponse.next();
+				if(resp.compareToIgnoreCase("y")==0) {
+					mar.sellObjects(h);
+					valid = true;
+				}
+				else if(resp.compareToIgnoreCase("n")==0) {
+					valid=true;
+					break;
+				}
+				else if(resp.compareToIgnoreCase("i")==0) {
+					showInformation();
+				}
+				else if(resp.compareToIgnoreCase("q")==0) {
+					quitGame();
+				}
+				else if(resp.compareToIgnoreCase("v")==0) {
+					displayInv();
+				}
+				else if(resp.compareToIgnoreCase("p")==0) {
+					potion(h);
+				}
+				else if(resp.compareToIgnoreCase("m")==0) {
+					System.out.println(world);
+				}
+				else {
+					System.out.println("Please enter a valid command");
+				}
 			}
-			else if(resp.compareToIgnoreCase("i")==0) {
-				showInformation();
-			}
-			else if(resp.compareToIgnoreCase("q")==0) {
-				quitGame();
-			}
-			else if(resp.compareToIgnoreCase("v")==0) {
-				displayInv();
-			}
-			else if(resp.compareToIgnoreCase("p")==0) {
-				potion(h);
-			}
-			else if(resp.compareToIgnoreCase("m")==0) {
-				System.out.println(world);
-			}
-			else {
-				System.out.println("Please enter a valid command");
-			}
-		}
-		System.out.println("Would you like to sell something?(Type Y/y for yes and N/n for no)");
-		valid = false;
-		while(!valid) {
-			String resp = userResponse.next();
-			if(resp.compareToIgnoreCase("y")==0) {
-				mar.sellObjects(h);
-				valid = true;
-			}
-			else if(resp.compareToIgnoreCase("n")==0) {
-				valid=true;
-				break;
-			}
-			else if(resp.compareToIgnoreCase("i")==0) {
-				showInformation();
-			}
-			else if(resp.compareToIgnoreCase("q")==0) {
-				quitGame();
-			}
-			else if(resp.compareToIgnoreCase("v")==0) {
-				displayInv();
-			}
-			else if(resp.compareToIgnoreCase("p")==0) {
-				potion(h);
-			}
-			else if(resp.compareToIgnoreCase("m")==0) {
-				System.out.println(world);
-			}
-			else {
-				System.out.println("Please enter a valid command");
+			System.out.println("Would you like to exit the market or continue shopping and selling items? (type e to exit and c to contine shopping");
+			valid = false;
+			while(!valid) {
+				String resp = userResponse.next();
+				if(resp.compareToIgnoreCase("e")==0) {
+					cont = false;
+					valid = true;
+				}
+				else if(resp.compareToIgnoreCase("c")==0) {
+					valid=true;
+				}
+				else {
+					System.out.println("Please enter a valid command");
+				}
 			}
 		}
 	}
