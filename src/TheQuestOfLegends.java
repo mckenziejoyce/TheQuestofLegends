@@ -28,8 +28,8 @@ public class TheQuestOfLegends {
 	private int monsterSpawn = 4;
 	
 	TheQuestOfLegends(){
-		herotxt = "src/heroes.txt";
-		monstertxt = "src/monsters.txt";
+		herotxt = "heroes.txt";
+		monstertxt = "monsters.txt";
 		heroes = new ArrayList<Hero>();
 		monsters = new ArrayList<Monster>();
 		world = new QuestBoard();
