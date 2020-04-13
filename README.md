@@ -1,4 +1,6 @@
 # Assignment 4: The Quest of Legends
+Group 7
+
 McKenzie Joyce
 U41215872
 
