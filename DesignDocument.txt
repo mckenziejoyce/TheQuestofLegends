@@ -1,0 +1,98 @@
+Design Document
+
+Group 7
+
+Student1: McKenzie Joyce U41215872
+
+Student2: Kelsey Myton U63892273
+
+**Class Files**
+All files were from Student1's previous implementation of the Quest assignment
+
+1. Market
+- This class represents the market. It manages the buying and selling process of all of the products(sellable objects).
+No changes were made to this class in this implementation.
+2. SellableObject
+- This class represents a market product which can be bought and sold in the market. 
+No changes were made to this class in this implementation.
+3. Potions
+- This class represents a potion object which extends the sellableObject class. A potion is a type of sellableObject.
+No changes were made to this class in this implementation.
+4. Spells
+-This class represents a spell object which extends the sellableObject class. A spell is a type of sellableObject.
+No changes were made to this class in this implementation.
+5. Weapons
+-This class represents a weapon object which extends the sellableObject class. A weapon is a type of sellableObject.
+No changes were made to this class in this implementation.
+6. Armor
+- This class represents a armor object which extends the sellableObject class. A armor is a type of sellableObject.
+No changes were made to this class in this implementation.
+
+7. LivingCreature
+- This class represents a player on the board.
+This is a new class to add a proper level hierarchy. It provides better inheritance.
+
+8. Hero
+- This class represents a hero object a type of LivingCreature
+In this implementation, this class now extends the LivingCreature class 
+9. Wallet
+- 
+10. Warrior
+- This class represents a Warrior object a type of hero. It extends the Hero class. 
+No changes were made to this class in this implementation.
+11. Sorcerer
+- This class represents a Warrior object a type of hero. It extends the Hero class.
+No changes were made to this class in this implementation.
+12. Paladin
+- This class represents a Paladin object a type of hero. It extends the Hero class. 
+No changes were made to this class in this implementation.
+
+13. Monster
+- This class represents a monster object a type of LivingCreature
+In this implementation, this class now extends the LivingCreature class 
+14. Dragon
+-This class represents a Dragon object a type of monster. It extends the Monster class.
+No changes were made to this class in this implementation.
+15. Exoskeleton
+- This class represents a Exoskeleton object a type of monster. It extends the monster class.
+No changes were made to this class in this implementation.
+16. Spirit
+-This class represents a Spirit object a type of monster. It extends the monster class.
+No changes were made to this class in this implementation.
+
+17. BoardTile
+- This class represents a board tile. 
+No changes were made to this class in this implementation.
+18. Board
+- This class represents a board which is a two dimensional array of boardtiles. It is a layout for what the current board looks like.
+No changes were made to this class in this implementation.
+19. QuestBoard
+- This class represents the gameboard for the quest of legends game. It extends the Board class.
+In this implementation, we added more gamepieces to represent the different types of cells that a questboard needs.
+Also, added arrays to represent the heros' coordinates on the board and the monsters'. We added a variable to keep track of the current hero. 
+These additions were to allow the heros to move separately around the board and not as a team. Also added to ability of multiple game pieces on a cell.
+A function was added to check for a winner. A function was added to bring a hero back to the hero Nexus as well. A teleport function was also added.
+20. GamePiece
+-This class represents a game piece. 
+No changes were made to this class in this implementation.
+
+21. Team
+- This class represents a team of living creatures.
+It was added in this implementation to better keep track of the team of heros and the team of monsters now that they can move freely. Also, it makes the game more scalable.
+22. TheQuestOfLegends
+- This class simulates the whole game. 
+There were many changes to this class in this implementation. A monsterRounds() and heroRounds() functions were added to simulate each round.
+Monsters also now only engage in fights when near a hero. The Heros' moves (options) were chnaged to fit the game(added teleporting and ability to go back to Nexus). 
+Each hero and monster were placed in certain positions to start. ChooseHeros() function was changed to require that you choose three players. 
+showInformation() was changed to print monsters information as well. addBoost () was added to give heros a boost at the sart of each round depending on the cell they were on. 
+
+23. Fightable
+- This is an interface 
+24. BoardGame
+- This is an interface 
+
+A few methods were also changed to account for the user inputing a letter instead of a number. This can not be turned into an int and ends up giving an exception. 
+So, more error checking was added throughout the methods from student2's previous implemention.
+
+
+
