@@ -1,0 +1,13 @@
+Dragon,Smaug,7,390,200,21
+Dragon,Drogon,3,140,60,10
+Dragon,Glaurung,2,90,40,9
+Dragon,Mushu,5,220,120,12
+Exoskeleton,Bones,6,130,150,17
+Exoskeleton,Darius,3,40,60,10
+Exoskeleton,HollowMumbler,7,200,390,30
+Exoskeleton,Fogseeker,1,20,22,4
+Exoskeleton,Blightscreamer,4,50,70,20
+Spirit,Banecrackle,6,130,220,58
+Spirit,Abyssscreamer,4,55,148,41
+Spirit,Gloomman,5,102,203,49
+Spirit,Rotgolem,1,20,13,11

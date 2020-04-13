@@ -1,0 +1,9 @@
+Warrior,Ajax,2,12,11,1000,14000,900
+Warrior,Leonidas,5,44,46,2500,4500,1500
+Warrior,Spartacus,8,71,68,4000,7400,3000
+Sorcerer,Gandalf,6,51,53,2700,2630,4000
+Sorcerer,Merlin,8,71,73,4000,3800,7000
+Sorcerer,Sauron,3,23,24,1200,1100,3000
+Paladin,Legolas,3,22,20,500,2400,3000
+Paladin,Aragorn,7,64,62,2500,6350,7000
+Paladin,Arya,4,30,29,700,3320,4000

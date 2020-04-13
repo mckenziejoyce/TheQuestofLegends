@@ -1,26 +1,30 @@
-# Assignment 3: The Quest
+# Assignment 4: The Quest of Legends
 McKenzie Joyce
-u41215872
+U41215872
 
-In this assignment I used Object Oriented Programming to create a game called the Quest. This game is designed for 1-3 players, who all play as heroes on a team using a shared terminal. The heroes and the monsters live in a world represented by a square grid of fixed dimensions. The heroes are able to fight the monsters using weapons, armors, potions and spells. The heroes can also augment their powers by purchasing items to assist in their quest. Every time the heroes win, they gain some experience and some money. When they accumulate enough experience they level up which means that their skills become stronger. The goal of the game is for the heroes to reach a very high level of experience.
+Kelsey Myton
+U63892273
+
+In this assignment we used Object Oriented Programming to create a game called the Quest of Legends. This game is designed for 3 players, who all play as heroes on a team using a shared terminal. The heroes and the monsters live in a world represented by a square grid of fixed dimensions. The heroes are able to fight the monsters using weapons, armors, potions and spells. The heroes can also augment their powers by purchasing items to assist in their quest. To win, one of the heros' must reach the monster Nexus on the other side of the board fighting monsters along the way. If a monster reaches a hero Nexus first, then the monsters win.
 
 ## Instructions for running the program
 1. Open terminal
-2. `cd` into the directory with TheQuest.java
-3. `javac TheQuest.java` to compile the program
-4. `java TheQuest` to run the program
+2. `cd` into the directory with TheQuestOfLegends.java
+3. `javac TheQuestOfLegends.java` to compile the program
+4. `java TheQuestOfLegends` to run the program
 
 ## Game Play
 - W/w: move up
 - A/a: move left
 - S/s: move down
 - D/d: move right
-- I/i: View information about your heroes (or if you are in a fight the monsters as well)
+- I/i: View information about your heroes and the monsters on the board
 - Q/q: Quit the game
 - V/v: Display inventories
-- C/c: Change weapon or armor
+- T/t: Teleport to any other accessible lane 
 - P/p: Consume Potion
 - M/m: Display the Map
+- B/b: Return to the Hero Nexus
 
 ## Format of Text Files:
 You are welcome to change the heroes/monsters/items you play with by editing the text files the format of entries are as follows
